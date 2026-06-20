@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
 import WorldMap from "@/components/map/WorldMap";
 import NewsPanel from "@/components/news/NewsPanel";
 import NewsTicker from "@/components/news/NewsTicker";
@@ -17,9 +18,12 @@ export default function Home() {
         overflow: "hidden",
         backgroundColor: "#0a0f1e",
         position: "relative",
+        paddingTop: "52px",
         paddingBottom: "40px",
+        boxSizing: "border-box",
       }}
     >
+      <Navbar />
       <WorldMap onCountrySelect={setSelectedCountry} />
       <NewsPanel selectedCountry={selectedCountry} onClose={() => setSelectedCountry(null)} />
       <CountryStats selectedCountry={selectedCountry} onClose={() => setSelectedCountry(null)} />

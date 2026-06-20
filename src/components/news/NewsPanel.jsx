@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import AISummary from "./AISummary";
 
 
 // Comprehensive country-to-ISO-2 mapping
@@ -326,10 +327,10 @@ export default function NewsPanel({ selectedCountry, onClose }) {
       <aside
         style={{
           position: "fixed",
-          top: 0,
+          top: "52px",
           right: 0,
           width: "380px",
-          height: "100vh",
+          height: "calc(100vh - 52px)",
           backgroundColor: "#0d1117",
           borderLeft: "1px solid rgba(51, 65, 85, 0.4)",
           boxShadow: "-10px 0 40px rgba(0,0,0,0.6)",
@@ -468,6 +469,8 @@ export default function NewsPanel({ selectedCountry, onClose }) {
             background: "#0d1117",
           }}
         >
+          {/* AI Intelligence Brief — shown when a country is selected */}
+          {selectedCountry && <AISummary country={selectedCountry} />}
           {loading ? (
             // Skeleton Loader
             Array.from({ length: selectedCountry ? 8 : 6 }).map((_, idx) => (

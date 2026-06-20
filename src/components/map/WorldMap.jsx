@@ -166,51 +166,7 @@ export default function WorldMap({ onCountrySelect }) {
         }}
       />
 
-      {/* Main Header Overlay */}
-      <header
-        style={{
-          position: "absolute",
-          top: "24px",
-          left: "24px",
-          zIndex: 10,
-          background: "rgba(10, 15, 30, 0.75)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(51, 65, 85, 0.5)",
-          borderRadius: "12px",
-          padding: "16px 24px",
-          boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.4)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
-          <span
-            style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
-              backgroundColor: "#ef4444",
-              boxShadow: "0 0 10px #ef4444",
-              display: "inline-block",
-              animation: "pulse 2s infinite ease-in-out",
-            }}
-          />
-          <h1
-            style={{
-              fontSize: "18px",
-              fontWeight: "800",
-              letterSpacing: "2px",
-              margin: 0,
-              background: "linear-gradient(to right, #ffffff, #94a3b8)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            WORLD PULSE
-          </h1>
-        </div>
-        <p style={{ fontSize: "11px", color: "#64748b", textTransform: "uppercase", letterSpacing: "1px", margin: 0 }}>
-          Global Tension Monitor
-        </p>
-      </header>
+
 
       {/* Loading Overlay */}
       {loading && (
@@ -416,43 +372,45 @@ export default function WorldMap({ onCountrySelect }) {
         </div>
       )}
 
-      {/* Legend Overlay */}
+      {/* Legend Overlay — horizontal strip above the news ticker */}
       <div
         style={{
           position: "absolute",
-          bottom: "24px",
+          bottom: "56px",
           left: "24px",
           zIndex: 10,
-          background: "rgba(10, 15, 30, 0.75)",
+          background: "rgba(10, 15, 30, 0.82)",
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(51, 65, 85, 0.5)",
-          borderRadius: "12px",
-          padding: "16px",
-          boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.4)",
+          borderRadius: "10px",
+          padding: "8px 14px",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
           display: "flex",
-          flexDirection: "column",
-          gap: "10px",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: "16px",
         }}
       >
-        <span style={{ fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "1px", textTransform: "uppercase" }}>
+        <span style={{ fontSize: "9.5px", fontWeight: "700", color: "#64748b", letterSpacing: "1.2px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
           Tension Scale
         </span>
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ width: "12px", height: "12px", borderRadius: "3px", backgroundColor: "#7f1d1d" }} />
-            <span style={{ fontSize: "12px", color: "#e2e8f0" }}>Conflict (61-100)</span>
+        <div style={{ width: "1px", height: "16px", backgroundColor: "rgba(51,65,85,0.6)" }} />
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ width: "10px", height: "10px", borderRadius: "2px", backgroundColor: "#7f1d1d", flexShrink: 0 }} />
+            <span style={{ fontSize: "11px", color: "#e2e8f0", whiteSpace: "nowrap" }}>Conflict</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ width: "12px", height: "12px", borderRadius: "3px", backgroundColor: "#7c4a00" }} />
-            <span style={{ fontSize: "12px", color: "#e2e8f0" }}>Elevated (31-60)</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ width: "10px", height: "10px", borderRadius: "2px", backgroundColor: "#7c4a00", flexShrink: 0 }} />
+            <span style={{ fontSize: "11px", color: "#e2e8f0", whiteSpace: "nowrap" }}>Elevated</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ width: "12px", height: "12px", borderRadius: "3px", backgroundColor: "#1e3a5f" }} />
-            <span style={{ fontSize: "12px", color: "#e2e8f0" }}>Calm (0-30)</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ width: "10px", height: "10px", borderRadius: "2px", backgroundColor: "#1e3a5f", flexShrink: 0 }} />
+            <span style={{ fontSize: "11px", color: "#e2e8f0", whiteSpace: "nowrap" }}>Calm</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ width: "12px", height: "12px", borderRadius: "3px", backgroundColor: "#1e293b" }} />
-            <span style={{ fontSize: "12px", color: "#94a3b8" }}>No Data</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ width: "10px", height: "10px", borderRadius: "2px", backgroundColor: "#1e293b", border: "1px solid rgba(51,65,85,0.5)", flexShrink: 0 }} />
+            <span style={{ fontSize: "11px", color: "#94a3b8", whiteSpace: "nowrap" }}>No Data</span>
           </div>
         </div>
       </div>
