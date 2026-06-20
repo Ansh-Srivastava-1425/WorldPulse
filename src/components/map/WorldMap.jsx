@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from "react-simple-maps";
 
 // Mock tension data inside the file as requested
 const tensionLevels = {
@@ -16,6 +16,18 @@ const tensionLevels = {
   "Iran": 88,
   "Israel": 82,
 };
+
+// Conflict hotspot markers shown on the map at all times
+const hotSpots = [
+  { name: "Ukraine-Russia Front", lat: 49.0, lng: 32.0, severity: "critical" },
+  { name: "Gaza Strip",          lat: 31.5, lng: 34.4, severity: "critical" },
+  { name: "Kashmir",             lat: 34.0, lng: 74.0, severity: "high" },
+  { name: "Sudan Civil War",     lat: 15.5, lng: 32.5, severity: "critical" },
+  { name: "Syria",               lat: 35.0, lng: 38.0, severity: "high" },
+  { name: "Yemen",               lat: 15.5, lng: 48.0, severity: "critical" },
+  { name: "Haiti",               lat: 18.9, lng: -72.3, severity: "high" },
+  { name: "Myanmar",             lat: 19.0, lng: 96.0, severity: "high" },
+];
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -300,6 +312,55 @@ export default function WorldMap({ onCountrySelect }) {
                   })
                 }
               </Geographies>
+
+              {/* Conflict Hotspot Markers — rendered after Geographies to sit on top */}
+              {hotSpots.map((spot) => {
+                const isCritical = spot.severity === "critical";
+                const color = isCritical ? "#ef4444" : "#f97316";
+                const size  = isCritical ? 8 : 6;
+                return (
+                  <Marker
+                    key={spot.name}
+                    coordinates={[spot.lng, spot.lat]}
+                    onMouseEnter={(event) => {
+                      setTooltip({
+                        name: spot.name,
+                        tension: undefined,
+                        isHotspot: true,
+                        severity: spot.severity,
+                        x: event.clientX,
+                        y: event.clientY,
+                      });
+                    }}
+                    onMouseMove={(event) => {
+                      setTooltip((prev) =>
+                        prev ? { ...prev, x: event.clientX, y: event.clientY } : null
+                      );
+                    }}
+                    onMouseLeave={() => setTooltip(null)}
+                    style={{ cursor: "crosshair" }}
+                  >
+                    {/* Outer pulsing ring */}
+                    <circle
+                      r={size * 1.8}
+                      fill={color}
+                      fillOpacity={0}
+                      stroke={color}
+                      strokeWidth={1.2}
+                      strokeOpacity={0.6}
+                      className="hotspot-pulse"
+                      style={{ transformOrigin: "center", transformBox: "fill-box" }}
+                    />
+                    {/* Inner solid dot */}
+                    <circle
+                      r={size / 2}
+                      fill={color}
+                      stroke="#0a0f1e"
+                      strokeWidth={1}
+                    />
+                  </Marker>
+                );
+              })}
             </ZoomableGroup>
           </ComposableMap>
         )}
@@ -333,18 +394,23 @@ export default function WorldMap({ onCountrySelect }) {
                 width: "6px",
                 height: "6px",
                 borderRadius: "50%",
-                backgroundColor:
-                  tooltip.tension === undefined
-                    ? "#475569"
-                    : tooltip.tension <= 30
-                    ? "#3b82f6"
-                    : tooltip.tension <= 60
-                    ? "#f59e0b"
-                    : "#ef4444",
+                backgroundColor: tooltip.isHotspot
+                  ? tooltip.severity === "critical" ? "#ef4444" : "#f97316"
+                  : tooltip.tension === undefined
+                  ? "#475569"
+                  : tooltip.tension <= 30
+                  ? "#3b82f6"
+                  : tooltip.tension <= 60
+                  ? "#f59e0b"
+                  : "#ef4444",
               }}
             />
             <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: "500" }}>
-              {tooltip.tension !== undefined ? `Tension: ${tooltip.tension}` : "No Threat Data"}
+              {tooltip.isHotspot
+                ? `Conflict Zone · ${tooltip.severity === "critical" ? "CRITICAL" : "HIGH"}`
+                : tooltip.tension !== undefined
+                ? `Tension: ${tooltip.tension}`
+                : "No Threat Data"}
             </span>
           </div>
         </div>
