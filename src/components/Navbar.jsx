@@ -1,16 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
-  { label: "Map", active: true },
-  { label: "Hot Zones", active: false },
-  { label: "Compare Countries", active: false },
-  { label: "Timeline", active: false },
+  { label: "Map",              href: "/" },
+  { label: "Hot Zones",        href: "/hot-zones" },
+  { label: "Compare Countries",href: "/compare" },
+  { label: "Timeline",         href: "/timeline" },
 ];
 
 export default function Navbar() {
   const [hovered, setHovered] = useState(null);
+  const pathname = usePathname();
 
   return (
     <>
@@ -70,7 +73,7 @@ export default function Navbar() {
         }}
       >
         {/* ── LEFT: Brand ── */}
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "12px" }}>
           {/* Pulsing red dot */}
           <span
             style={{
@@ -114,33 +117,34 @@ export default function Navbar() {
               GLOBAL TENSION MONITOR
             </span>
           </div>
-        </div>
+        </Link>
 
         {/* ── RIGHT: Nav links + LIVE badge ── */}
         <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
-          {NAV_LINKS.map(({ label, active }) => (
-            <span
-              key={label}
-              className={`nav-link-item${active ? " active" : ""}`}
-              style={{
-                fontSize: "12px",
-                fontFamily: "'Courier New', Courier, monospace",
-                fontWeight: active ? "700" : "500",
-                letterSpacing: "0.8px",
-                color:
-                  hovered === label
-                    ? "#ffffff"
-                    : active
-                    ? "#e2e8f0"
-                    : "#94a3b8",
-                textTransform: "uppercase",
-              }}
-              onMouseEnter={() => setHovered(label)}
-              onMouseLeave={() => setHovered(null)}
-            >
-              {label}
-            </span>
-          ))}
+          {NAV_LINKS.map(({ label, href }) => {
+            const isActive = pathname === href;
+            const isHovered = hovered === label;
+            return (
+              <Link
+                key={label}
+                href={href}
+                className={`nav-link-item${isActive ? " active" : ""}`}
+                style={{
+                  fontSize: "12px",
+                  fontFamily: "'Courier New', Courier, monospace",
+                  fontWeight: isActive ? "700" : "500",
+                  letterSpacing: "0.8px",
+                  color: isHovered ? "#ffffff" : isActive ? "#e2e8f0" : "#94a3b8",
+                  textTransform: "uppercase",
+                  textDecoration: "none",
+                }}
+                onMouseEnter={() => setHovered(label)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                {label}
+              </Link>
+            );
+          })}
 
           {/* Divider */}
           <span

@@ -282,16 +282,10 @@ export default function AISummary({ country }) {
                 <span
                   style={{
                     fontSize: "9.5px",
-                    fontWeight: "800",
+                    fontWeight: "700",
                     letterSpacing: "2px",
                     textTransform: "uppercase",
-                    background: loading
-                      ? "linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b)"
-                      : "linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8)",
-                    backgroundSize: "200% auto",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    animation: "ai-shimmer 2.5s linear infinite",
+                    color: loading ? "#f59e0b" : "#94a3b8",
                   }}
                 >
                   {loading ? "Analyzing…" : "Intelligence Brief"}
