@@ -38,20 +38,6 @@ const COUNTRIES = [
   { name: "Vietnam", code: "VN" },
 ];
 
-const formatTimeAgo = (dateString) => {
-  if (!dateString) return "";
-  const now = new Date();
-  const date = new Date(dateString);
-  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-};
-
 const fetchStats = async (code) => {
   try {
     const res = await fetch(`https://restcountries.com/v3.1/alpha/${code.toLowerCase()}`);
