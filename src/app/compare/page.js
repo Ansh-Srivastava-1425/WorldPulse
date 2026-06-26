@@ -71,8 +71,9 @@ function CountryColumn({ selectedCountryCode, onCountryChange }) {
         const res = await fetch(`https://restcountries.com/v3.1/alpha/${selectedCountryCode}`);
         if (!res.ok) throw new Error("Stats fetch failed");
         const data = await res.json();
-        if (active && data && data[0]) {
-          setStats(data[0]);
+        const country = Array.isArray(data) ? data[0] : data;
+        if (active && country) {
+          setStats(country);
         }
       } catch (err) {
         console.error("Failed to fetch stats", err);
@@ -87,17 +88,9 @@ function CountryColumn({ selectedCountryCode, onCountryChange }) {
         const res = await fetch(`/api/news?country=${selectedCountryCode.toLowerCase()}`);
         if (!res.ok) throw new Error("News fetch failed");
         const data = await res.json();
+        const articles = data.articles ?? [];
         if (active) {
-          if (data.articles && data.articles.length > 0) {
-            setNews(data.articles.slice(0, 4));
-          } else {
-            setNews([
-              { title: `Demo Headline 1 for ${selectedCountry?.name}`, source: { name: "Demo Source" }, publishedAt: new Date().toISOString(), url: "#" },
-              { title: `Demo Headline 2 for ${selectedCountry?.name}`, source: { name: "Demo Source" }, publishedAt: new Date().toISOString(), url: "#" },
-              { title: `Demo Headline 3 for ${selectedCountry?.name}`, source: { name: "Demo Source" }, publishedAt: new Date().toISOString(), url: "#" },
-              { title: `Demo Headline 4 for ${selectedCountry?.name}`, source: { name: "Demo Source" }, publishedAt: new Date().toISOString(), url: "#" },
-            ]);
-          }
+          setNews(articles.slice(0, 4));
         }
       } catch (err) {
         console.error("Failed to fetch news", err);
@@ -171,7 +164,11 @@ function CountryColumn({ selectedCountryCode, onCountryChange }) {
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontSize: "14.5px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ color: "#94a3b8" }}>Flag</span>
-              <span style={{ fontSize: "28px", lineHeight: "1" }}>{stats.flag || stats.cca2}</span>
+              <span style={{ fontSize: "28px", lineHeight: "1" }}>{stats.flags?.emoji || stats.cca2}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(51, 65, 85, 0.5)", paddingBottom: "6px" }}>
+              <span style={{ color: "#94a3b8" }}>Country name</span>
+              <span style={{ fontWeight: "500" }}>{stats.name?.common || "N/A"}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(51, 65, 85, 0.5)", paddingBottom: "6px" }}>
               <span style={{ color: "#94a3b8" }}>Capital</span>
@@ -233,7 +230,7 @@ function CountryColumn({ selectedCountryCode, onCountryChange }) {
                  <div style={{ display: "flex", gap: "6px" }}>
                     <span style={{ color: "#cbd5e1", fontWeight: "600" }}>{article.source?.name}</span>
                     <span>•</span>
-                    <span>{formatTimeAgo(article.publishedAt)}</span>
+                    <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
                  </div>
                  <a href={article.url} target="_blank" rel="noopener noreferrer" style={{ color: "#3b82f6", textDecoration: "none", fontWeight: "600", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                    Read More
@@ -277,7 +274,8 @@ export default function ComparePage() {
       <div
         style={{
           minHeight: "100vh",
-          backgroundColor: "#0d1117",
+          overflowY: "auto",
+          background: "#0d1117",
           padding: "90px 24px 60px 24px",
           fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
           boxSizing: "border-box",
