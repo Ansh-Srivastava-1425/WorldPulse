@@ -1,18 +1,18 @@
 import Groq from "groq-sdk";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 export async function POST(request) {
-  // Confirm the key is loading (shows first 8 chars so it's not fully exposed in logs)
   const key = process.env.GROQ_API_KEY;
   console.log("[summary] GROQ_API_KEY loaded:", key ? `${key.slice(0, 8)}… (length: ${key.length})` : "MISSING / undefined");
+
+  // Initialize inside the handler so it reads env at runtime, not build time
+  const groq = new Groq({ apiKey: key });
 
   const { country } = await request.json();
   console.log("[summary] Requesting brief for country:", country);
 
   try {
     const completion = await groq.chat.completions.create({
-     model: "llama-3.3-70b-versatile",
+      model: "llama-3.3-70b-versatile",
       messages: [
         {
           role: "user",
