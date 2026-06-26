@@ -52,6 +52,34 @@ const formatTimeAgo = (dateString) => {
   return `${days}d ago`;
 };
 
+const fetchStats = async (code) => {
+  try {
+    const res = await fetch(`https://restcountries.com/v3.1/alpha/${code.toLowerCase()}`);
+    const data = await res.json();
+    const c = Array.isArray(data) ? data[0] : data;
+    return {
+      flag: c.flags?.emoji || "🏳️",
+      name: c.name?.common || code,
+      capital: c.capital?.[0] || "N/A",
+      population: c.population?.toLocaleString() || "N/A",
+      region: c.region || "N/A",
+      area: c.area?.toLocaleString() + " km²" || "N/A",
+    };
+  } catch {
+    return null;
+  }
+};
+
+const fetchNews = async (code) => {
+  try {
+    const res = await fetch(`/api/news?country=${code.toLowerCase()}`);
+    const data = await res.json();
+    return data.articles ?? [];
+  } catch {
+    return [];
+  }
+};
+
 function CountryColumn({ selectedCountryCode, onCountryChange }) {
   const [stats, setStats] = useState(null);
   const [news, setNews] = useState([]);
@@ -65,45 +93,26 @@ function CountryColumn({ selectedCountryCode, onCountryChange }) {
 
     let active = true;
 
-    const fetchStats = async () => {
+    const loadStats = async () => {
       setLoadingStats(true);
-      try {
-        const res = await fetch(`https://restcountries.com/v3.1/alpha/${selectedCountryCode}`);
-        if (!res.ok) throw new Error("Stats fetch failed");
-        const data = await res.json();
-        const country = Array.isArray(data) ? data[0] : data;
-        if (active && country) {
-          setStats(country);
-        }
-      } catch (err) {
-        console.error("Failed to fetch stats", err);
-      } finally {
-        if (active) setLoadingStats(false);
+      const result = await fetchStats(selectedCountryCode);
+      if (active) {
+        setStats(result);
+        setLoadingStats(false);
       }
     };
 
-    const fetchNews = async () => {
+    const loadNews = async () => {
       setLoadingNews(true);
-      try {
-        const res = await fetch(`/api/news?country=${selectedCountryCode.toLowerCase()}`);
-        if (!res.ok) throw new Error("News fetch failed");
-        const data = await res.json();
-        const articles = data.articles ?? [];
-        if (active) {
-          setNews(articles.slice(0, 4));
-        }
-      } catch (err) {
-        console.error("Failed to fetch news", err);
-        if (active) {
-          setNews([]);
-        }
-      } finally {
-        if (active) setLoadingNews(false);
+      const result = await fetchNews(selectedCountryCode);
+      if (active) {
+        setNews(result.slice(0, 4));
+        setLoadingNews(false);
       }
     };
 
-    fetchStats();
-    fetchNews();
+    loadStats();
+    loadNews();
 
     return () => {
       active = false;
@@ -164,27 +173,27 @@ function CountryColumn({ selectedCountryCode, onCountryChange }) {
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontSize: "14.5px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ color: "#94a3b8" }}>Flag</span>
-              <span style={{ fontSize: "28px", lineHeight: "1" }}>{stats.flags?.emoji || stats.cca2}</span>
+              <span style={{ fontSize: "28px", lineHeight: "1" }}>{stats.flag}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(51, 65, 85, 0.5)", paddingBottom: "6px" }}>
               <span style={{ color: "#94a3b8" }}>Country name</span>
-              <span style={{ fontWeight: "500" }}>{stats.name?.common || "N/A"}</span>
+              <span style={{ fontWeight: "500" }}>{stats.name}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(51, 65, 85, 0.5)", paddingBottom: "6px" }}>
               <span style={{ color: "#94a3b8" }}>Capital</span>
-              <span style={{ fontWeight: "500" }}>{stats.capital?.[0] || "N/A"}</span>
+              <span style={{ fontWeight: "500" }}>{stats.capital}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(51, 65, 85, 0.5)", paddingBottom: "6px" }}>
               <span style={{ color: "#94a3b8" }}>Population</span>
-              <span style={{ fontWeight: "500" }}>{stats.population?.toLocaleString() || "N/A"}</span>
+              <span style={{ fontWeight: "500" }}>{stats.population}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid rgba(51, 65, 85, 0.5)", paddingBottom: "6px" }}>
               <span style={{ color: "#94a3b8" }}>Region</span>
-              <span style={{ fontWeight: "500" }}>{stats.region || "N/A"}</span>
+              <span style={{ fontWeight: "500" }}>{stats.region}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "#94a3b8" }}>Area (km²)</span>
-              <span style={{ fontWeight: "500" }}>{stats.area?.toLocaleString() || "N/A"}</span>
+              <span style={{ color: "#94a3b8" }}>Area</span>
+              <span style={{ fontWeight: "500" }}>{stats.area}</span>
             </div>
           </div>
         ) : (
@@ -276,6 +285,7 @@ export default function ComparePage() {
           minHeight: "100vh",
           overflowY: "auto",
           background: "#0d1117",
+          color: "#e2e8f0",
           padding: "90px 24px 60px 24px",
           fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
           boxSizing: "border-box",
