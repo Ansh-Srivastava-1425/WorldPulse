@@ -40,26 +40,24 @@ const COUNTRIES = [
 
 const fetchStats = async (code) => {
   try {
-    const res = await fetch(`https://restcountries.com/v3.1/alpha/${code.toLowerCase()}`);
+    const res = await fetch(`/api/stats?code=${code}`);
     const data = await res.json();
-    const c = Array.isArray(data) ? data[0] : data;
-    return {
-      flag: c.flags?.emoji || "🏳️",
-      name: c.name?.common || code,
-      capital: c.capital?.[0] || "N/A",
-      population: c.population?.toLocaleString() || "N/A",
-      region: c.region || "N/A",
-      area: c.area?.toLocaleString() + " km²" || "N/A",
-    };
+    if (data.error) return null;
+    return data;
   } catch {
     return null;
   }
 };
 
-const fetchNews = async (code) => {
+const fetchNews = async (code, countryName) => {
   try {
-    const res = await fetch(`/api/news?country=${code.toLowerCase()}`);
-    const data = await res.json();
+    let res = await fetch(`/api/news?country=${code.toLowerCase()}`);
+    let data = await res.json();
+    if (!data.articles || data.articles.length === 0) {
+      // Fallback: search by country name
+      res = await fetch(`/api/news?q=${encodeURIComponent(countryName)}`);
+      data = await res.json();
+    }
     return data.articles ?? [];
   } catch {
     return [];
@@ -90,7 +88,7 @@ function CountryColumn({ selectedCountryCode, onCountryChange }) {
 
     const loadNews = async () => {
       setLoadingNews(true);
-      const result = await fetchNews(selectedCountryCode);
+      const result = await fetchNews(selectedCountryCode, selectedCountry?.name || "");
       if (active) {
         setNews(result.slice(0, 4));
         setLoadingNews(false);
